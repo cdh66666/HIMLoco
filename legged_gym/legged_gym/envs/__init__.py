@@ -31,10 +31,11 @@
 from legged_gym import LEGGED_GYM_ROOT_DIR, LEGGED_GYM_ENVS_DIR
 from legged_gym.envs.a1.a1_config import A1RoughCfg, A1RoughCfgPPO
 from .base.legged_robot import LeggedRobot
+# from .base.cdh_cartpole import CdhCartpole
 from .a1.a1_config import A1RoughCfg, A1RoughCfgPPO
 from legged_gym.envs.go1.go1_config import Go1RoughCfg, Go1RoughCfgPPO
 from legged_gym.envs.aliengo.aliengo_config import AlienGoRoughCfg, AlienGoRoughCfgPPO
-
+# from legged_gym.envs.cdh_cartpole.cdh_cartpole_config import Cdh_CartPoleRoughCfg, Cdh_CartPoleRoughCfgPPO
 import os
 
 from legged_gym.utils.task_registry import task_registry
@@ -42,3 +43,5 @@ from legged_gym.utils.task_registry import task_registry
 task_registry.register( "a1", LeggedRobot, A1RoughCfg(), A1RoughCfgPPO() )
 task_registry.register( "go1", LeggedRobot, Go1RoughCfg(), Go1RoughCfgPPO() )
 task_registry.register( "aliengo", LeggedRobot, AlienGoRoughCfg(), AlienGoRoughCfgPPO() )
+#注册一个新环境，倒立摆环境练手
+# task_registry.register( "Cartpole", CdhCartpole, Cdh_CartPoleRoughCfg(), Cdh_CartPoleRoughCfgPPO() )

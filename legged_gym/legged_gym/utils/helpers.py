@@ -78,27 +78,42 @@ def set_seed(seed):
     torch.cuda.manual_seed_all(seed)
 
 def parse_sim_params(args, cfg):
-    # code from Isaac Gym Preview 2
-    # initialize sim params
+    """
+    解析模拟参数，根据命令行参数和配置字典来初始化和设置 Isaac Gym 的模拟参数。
+
+    参数:
+    args (object): 包含命令行参数的对象。
+    cfg (dict): 包含模拟配置的字典。
+
+    返回:
+    gymapi.SimParams: 初始化并设置好的模拟参数对象。
+    """
+    # 代码来源于 Isaac Gym Preview 2
+    # 初始化模拟参数对象
     sim_params = gymapi.SimParams()
 
-    # set some values from args
+    # 根据命令行参数设置一些模拟参数
     if args.physics_engine == gymapi.SIM_FLEX:
+        # 如果使用 Flex 物理引擎且设备不是 CPU，给出警告
         if args.device != "cpu":
             print("WARNING: Using Flex with GPU instead of PHYSX!")
     elif args.physics_engine == gymapi.SIM_PHYSX:
+        # 如果使用 PhysX 物理引擎，设置是否使用 GPU 以及子场景数量
         sim_params.physx.use_gpu = args.use_gpu
         sim_params.physx.num_subscenes = args.subscenes
+    # 设置是否使用 GPU 流水线
     sim_params.use_gpu_pipeline = args.use_gpu_pipeline
 
-    # if sim options are provided in cfg, parse them and update/override above:
+    # 如果配置字典中包含 "sim" 键，解析其中的模拟选项并更新或覆盖之前设置的参数
     if "sim" in cfg:
+        # 调用 gymutil.parse_sim_config 函数解析配置字典中的模拟参数
         gymutil.parse_sim_config(cfg["sim"], sim_params)
 
-    # Override num_threads if passed on the command line
+    # 如果命令行中指定了线程数且使用 PhysX 物理引擎，则覆盖模拟参数中的线程数
     if args.physics_engine == gymapi.SIM_PHYSX and args.num_threads > 0:
         sim_params.physx.num_threads = args.num_threads
 
+    # 返回设置好的模拟参数对象
     return sim_params
 
 def get_load_path(root, load_run=-1, checkpoint=-1):
@@ -126,28 +141,48 @@ def get_load_path(root, load_run=-1, checkpoint=-1):
     return load_path
 
 def update_cfg_from_args(env_cfg, cfg_train, args):
-    # seed
+    """
+    根据命令行参数更新环境配置和训练配置。
+
+    参数:
+    env_cfg (object): 环境配置对象。
+    cfg_train (object): 训练配置对象。
+    args (object): 命令行参数对象。
+
+    返回:
+    tuple: 包含更新后的环境配置和训练配置的元组。
+    """
+    # 处理随机种子
     if env_cfg is not None:
-        # num envs
+        # 处理环境数量
         if args.num_envs is not None:
+            # 如果命令行指定了环境数量，更新环境配置中的环境数量
             env_cfg.env.num_envs = args.num_envs
         if args.seed is not None:
+            # 如果命令行指定了随机种子，更新环境配置中的随机种子
             env_cfg.seed = args.seed
     if cfg_train is not None:
         if args.seed is not None:
+            # 如果命令行指定了随机种子，更新训练配置中的随机种子
             cfg_train.seed = args.seed
-        # alg runner parameters
+        # 处理算法运行器的参数
         if args.max_iterations is not None:
+            # 如果命令行指定了最大迭代次数，更新训练配置中的最大迭代次数
             cfg_train.runner.max_iterations = args.max_iterations
         if args.resume:
+            # 如果命令行指定了恢复训练，更新训练配置中的恢复训练标志
             cfg_train.runner.resume = args.resume
         if args.experiment_name is not None:
+            # 如果命令行指定了实验名称，更新训练配置中的实验名称
             cfg_train.runner.experiment_name = args.experiment_name
         if args.run_name is not None:
+            # 如果命令行指定了运行名称，更新训练配置中的运行名称
             cfg_train.runner.run_name = args.run_name
         if args.load_run is not None:
+            # 如果命令行指定了要加载的运行名称，更新训练配置中的加载运行名称
             cfg_train.runner.load_run = args.load_run
         if args.checkpoint is not None:
+            # 如果命令行指定了检查点编号，更新训练配置中的检查点编号
             cfg_train.runner.checkpoint = args.checkpoint
 
     return env_cfg, cfg_train
